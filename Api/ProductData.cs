@@ -70,6 +70,7 @@ public class ProductData : IProductData
 
     public Task<IEnumerable<Product>> GetProducts()
     {
-        return Task.FromResult(products.AsEnumerable());
+        IEnumerable<Product> list = [.. products];
+        return Task.FromResult(list);
     }
 }
