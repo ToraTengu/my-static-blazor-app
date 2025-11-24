@@ -10,6 +10,7 @@ public interface IProductData
 {
     Task<Product> AddProduct(Product product);
     Task<bool> DeleteProduct(int id);
+    Task<Product> GetProduct(int id);
     Task<IEnumerable<Product>> GetProducts();
     Task<Product> UpdateProduct(Product product);
 }
@@ -50,22 +51,50 @@ public class ProductData : IProductData
     public Task<Product> AddProduct(Product product)
     {
         product.Id = GetRandomInt();
-        products.Add(product);
+
+        if (!products.Any(p => p.Id == product.Id))
+        {
+            products.Add(product);
+        }
+
         return Task.FromResult(product);
     }
 
-    public Task<Product> UpdateProduct(Product product)
+    public Task<Product?> UpdateProduct(Product product)
     {
         var index = products.FindIndex(p => p.Id == product.Id);
-        products[index] = product;
+
+        if (index > -1)
+        {
+            products[index] = product;
+        }
+
         return Task.FromResult(product);
     }
 
     public Task<bool> DeleteProduct(int id)
     {
         var index = products.FindIndex(p => p.Id == id);
-        products.RemoveAt(index);
-        return Task.FromResult(true);
+
+        if (index > -1)
+        {
+            products.RemoveAt(index);
+        }
+
+        return Task.FromResult(index > -1);
+    }
+
+    public Task<Product?> GetProduct(int id)
+    {
+        Product? product = null;
+        var index = products.FindIndex(p => p.Id == id);
+
+        if (index > -1)
+        {
+            product = products[index];
+        }
+
+        return Task.FromResult(product);
     }
 
     public Task<IEnumerable<Product>> GetProducts()
