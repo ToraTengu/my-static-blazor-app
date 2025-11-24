@@ -21,13 +21,19 @@ public class ProductsPut
 
     [FunctionName("ProductsPut")]
     public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "products")] HttpRequest req,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "products/{id:int}")] HttpRequest req,
+        int id,
         ILogger log)
     {
         var body = await new StreamReader(req.Body).ReadToEndAsync();
         var product = JsonSerializer.Deserialize<Product>(body, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 
-        var updatedProduct = await productData.UpdateProduct(product);
-        return new OkObjectResult(updatedProduct);
+        if (id == product.Id)
+        {
+            var updatedProduct = await productData.UpdateProduct(product);
+            return new OkObjectResult(updatedProduct);
+        }
+
+        return new BadRequestResult();
     }
 }
